@@ -9,35 +9,179 @@ import (
 
 func TestCalculator(t *testing.T) {
 	const MaxRecipientCnt = 1
+	type args struct {
+		restrictions map[string][]string
+	}
 
-	restrictions := map[string][]string{
-		"Дима":   {"Ира"},
-		"Ира":    {"Дима"},
-		"Никита": {"Люба"},
-		"Люба":   {"Никита"},
-		"Миша":   {"Настя"},
-		"Настя":  {"Миша"},
+	var tests = []struct {
+		name    string
+		args    args
+		wantErr error
+	}{
+		{
+			name: "with nil participants",
+			args: args{
+				restrictions: nil,
+			},
+			wantErr: ErrNotEnoughParticipants,
+		},
+		{
+			name: "without participants",
+			args: args{
+				restrictions: map[string][]string{},
+			},
+			wantErr: ErrNotEnoughParticipants,
+		},
+		{
+			name: "2 participants",
+			args: args{
+				restrictions: map[string][]string{
+					"Петя":  {},
+					"Света": {},
+				},
+			},
+			wantErr: ErrNotEnoughParticipants,
+		},
+		{
+			name: "3 participants with invalid restrictions",
+			args: args{
+				restrictions: map[string][]string{
+					"Петя":  {"Света"},
+					"Света": {"Петя"},
+					"Паша":  {},
+				},
+			},
+			wantErr: ErrIncorrectRestrictions,
+		},
+		{
+			name: "3 participants with no available for one of them",
+			args: args{
+				restrictions: map[string][]string{
+					"Петя":  {"Света", "Паша"},
+					"Света": {"Петя"},
+					"Паша":  {},
+				},
+			},
+			wantErr: ErrIncorrectRestrictions,
+		},
+		{
+			name: "3 participants with valid restrictions",
+			args: args{
+				restrictions: map[string][]string{
+					"Петя":  {"Света"},
+					"Света": {"Паша"},
+					"Паша":  {"Петя"},
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "4 participants with valid restrictions 1",
+			args: args{
+				restrictions: map[string][]string{
+					"Петя":  {"Света"},
+					"Света": {"Паша"},
+					"Паша":  {"Галя"},
+					"Галя":  {"Петя"},
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "4 participants with valid restrictions 2",
+			args: args{
+				restrictions: map[string][]string{
+					"Петя":  {"Света"},
+					"Света": {"Петя"},
+					"Паша":  {"Галя"},
+					"Галя":  {"Паша"},
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "4 participants with valid restrictions 3",
+			args: args{
+				restrictions: map[string][]string{
+					"Петя":  {"Света", "Паша"},
+					"Света": {"Петя"},
+					"Паша":  {"Галя"},
+					"Галя":  {"Паша"},
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "4 participants with valid restrictions 4",
+			args: args{
+				restrictions: map[string][]string{
+					"Петя":  {"Света", "Паша", "Петя", "Оксана"},
+					"Света": {"Петя"},
+					"Паша":  {"Галя"},
+					"Галя":  {"Паша"},
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "4 participants with valid restrictions 5",
+			args: args{
+				restrictions: map[string][]string{
+					"Петя":  {"Света", "Паша"}, //Гале
+					"Света": {"Петя", "Галя"},  //Паше
+					"Паша":  {"Галя", "Петя"},  //Свете
+					"Галя":  {"Паша", "Света"}, //Пете
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "with one restrict for each participant",
+			args: args{
+				restrictions: map[string][]string{
+					"Дима":   {"Ира"},
+					"Ира":    {"Дима"},
+					"Никита": {"Люба"},
+					"Люба":   {"Никита"},
+					"Миша":   {"Настя"},
+					"Настя":  {"Миша"},
+				},
+			},
+			wantErr: nil,
+		},
 	}
 
 	Convey("test calculator", t, func() {
-		c := NewCalculator(restrictions)
-		res := c.CalculateRecipient()
+		for _, tt := range tests {
+			Convey(tt.name, func() {
+				arg := tt.args.restrictions
+				c, err := NewCalculator(arg)
+				if tt.wantErr != nil {
+					So(err, ShouldNotBeNil)
+					So(err, ShouldWrap, tt.wantErr)
+					return
+				} else if err != nil {
+					t.Fatal(err)
+				}
 
-		fmt.Printf("%+v\n", res)
+				res := c.CalculateRecipient()
+				fmt.Printf("%+v\n", res)
 
-		recipientCounts := make(map[string]int, len(restrictions))
-		for p := range restrictions {
-			recipientCounts[p] = 0
-		}
+				recipientCounts := make(map[string]int, len(arg))
+				for p := range arg {
+					recipientCounts[p] = 0
+				}
 
-		for sender, recipient := range res {
-			recipientCounts[string(recipient)]++
-			So(sender, ShouldNotEqual, recipient)
-			So(recipient, ShouldNotBeIn, restrictions[string(sender)])
-		}
+				for sender, recipient := range res {
+					recipientCounts[string(recipient)]++
+					So(sender, ShouldNotEqual, recipient)
+					So(recipient, ShouldNotBeIn, arg[string(sender)])
+				}
 
-		for p := range restrictions {
-			So(recipientCounts[p], ShouldEqual, MaxRecipientCnt)
+				for p := range arg {
+					So(recipientCounts[p], ShouldEqual, MaxRecipientCnt)
+				}
+			})
 		}
 	})
 }

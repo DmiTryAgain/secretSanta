@@ -9,20 +9,20 @@ PasswordSender = "examplePass"
 
 ## Информация об участниках email->имя
 [Participants]
-"email1@test.com" = "Муж 1"
-"email2@test.com" = "Жена 1"
-"email3@test.com" = "Муж 2"
-"email4@test.com" = "Жена 2"
-"email5@test.com" = "Муж 3"
-"email6@test.com" = "Жена 3"
-"email7@test.com" = "Сам по себе"
+"email1@test.com" = "Петя"
+"email2@test.com" = "Света"
+"email3@test.com" = "Вася"
+"email4@test.com" = "Аня"
+"email5@test.com" = "Коля"
+"email6@test.com" = "Света"
+"email7@test.com" = "Борис"
 
 ## Ограничения email отправителя, которому не должен достаться email получателя emailSender->emailRecipient
 [Restrictions]
-"email1@test.com" = [ "email1@test.com", ]
-"email2@test.com" = [ "email2@test.com", ]
-"email3@test.com" = [ "email4@test.com", ]
-"email4@test.com" = [ "email3@test.com", ]
-"email5@test.com" = [ "email6@test.com", ]
+"email1@test.com" = [ "email2@test.com" ]
+"email2@test.com" = [ "email1@test.com" ]
+"email3@test.com" = [ "email4@test.com" ]
+"email4@test.com" = [ "email3@test.com" ]
+"email5@test.com" = [ "email6@test.com" ]
 "email6@test.com" = [ "email5@test.com", "email1@test.com" ]
 "email7@test.com" = []

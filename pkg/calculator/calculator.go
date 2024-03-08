@@ -1,11 +1,16 @@
 package calculator
 
 type Calculator struct {
-	restrictionByParticipant Restrictions
+	restrictionByParticipant RestrictionsByParticipant
 }
 
-func NewCalculator(restrictions map[string][]string) *Calculator {
-	return &Calculator{restrictionByParticipant: NewRestrictions(restrictions)}
+func NewCalculator(restrictions map[string][]string) (*Calculator, error) {
+	rs := NewRestrictionsByParticipant(restrictions)
+	if err := rs.validate(); err != nil {
+		return nil, err
+	}
+	return &Calculator{restrictionByParticipant: rs}, nil
+
 }
 
 func (c *Calculator) CalculateRecipient() SenderByRecipient {
@@ -25,7 +30,7 @@ func (c *Calculator) CalculateRecipient() SenderByRecipient {
 				continue
 			}
 
-			if restrictRecipientIDs := c.restrictionByParticipant[senderID]; restrictRecipientIDs.Contains(recipientID) {
+			if restrictRecipientIDs := c.restrictionByParticipant[senderID]; restrictRecipientIDs.contains(recipientID) {
 				continue
 			}
 
@@ -35,7 +40,6 @@ func (c *Calculator) CalculateRecipient() SenderByRecipient {
 		}
 	}
 
-	//todo: Ахтунг! Провалидировать входные данные, чтобы не зарекурситься
 	if len(res) != len(c.restrictionByParticipant) {
 		res = c.CalculateRecipient()
 	}

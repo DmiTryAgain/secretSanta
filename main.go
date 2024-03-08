@@ -41,7 +41,11 @@ func main() {
 }
 
 func exec() {
-	c := calculator.NewCalculator(cfg.Restrictions)
+	c, err := calculator.NewCalculator(cfg.Restrictions)
+	if err != nil {
+		fmt.Printf("при расчёте произошоа ошибка: %v", err)
+	}
+
 	res := c.CalculateRecipient()
 	wg := sync.WaitGroup{}
 	start := time.Now()
