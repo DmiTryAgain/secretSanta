@@ -19,6 +19,20 @@ func TestCalculator(t *testing.T) {
 		wantErr error
 	}{
 		{
+			name: "with nil participants",
+			args: args{
+				restrictions: nil,
+			},
+			wantErr: ErrNotEnoughParticipants,
+		},
+		{
+			name: "without participants",
+			args: args{
+				restrictions: map[string][]string{},
+			},
+			wantErr: ErrNotEnoughParticipants,
+		},
+		{
 			name: "2 participants",
 			args: args{
 				restrictions: map[string][]string{
@@ -33,6 +47,17 @@ func TestCalculator(t *testing.T) {
 			args: args{
 				restrictions: map[string][]string{
 					"Петя":  {"Света"},
+					"Света": {"Петя"},
+					"Паша":  {},
+				},
+			},
+			wantErr: ErrIncorrectRestrictions,
+		},
+		{
+			name: "3 participants with no available for one of them",
+			args: args{
+				restrictions: map[string][]string{
+					"Петя":  {"Света", "Паша"},
 					"Света": {"Петя"},
 					"Паша":  {},
 				},
@@ -131,9 +156,12 @@ func TestCalculator(t *testing.T) {
 			Convey(tt.name, func() {
 				arg := tt.args.restrictions
 				c, err := NewCalculator(arg)
-				So(tt.wantErr, ShouldBeError, err)
-				if err != nil {
+				if tt.wantErr != nil {
+					So(err, ShouldNotBeNil)
+					So(err, ShouldWrap, tt.wantErr)
 					return
+				} else if err != nil {
+					t.Fatal(err)
 				}
 
 				res := c.CalculateRecipient()

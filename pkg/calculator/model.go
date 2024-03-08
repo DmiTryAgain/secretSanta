@@ -1,8 +1,9 @@
 package calculator
 
 import (
-	"errors"
 	"fmt"
+
+	"github.com/pkg/errors"
 )
 
 const (
@@ -62,8 +63,7 @@ func (r RestrictionsByParticipant) validate() error {
 
 		// Если хоть у кого-то уже нет доступных получателей, выходим с ошибкой
 		if len(remainsParticipants) == 0 {
-			// TODO: улучшить обработку и добавить в тесты
-			return errors.Join(ErrIncorrectRestrictions, fmt.Errorf("у участника %s нет доступных получателей", p))
+			return errors.Wrap(ErrIncorrectRestrictions, fmt.Sprintf("у участника %s нет доступных получателей", p))
 		}
 
 		// Запоминаем возможных получателей для каждого участника
@@ -90,9 +90,8 @@ func (r RestrictionsByParticipant) validate() error {
 			for id := range countByParticipant {
 				errText += fmt.Sprintf("%s\n", id)
 			}
-			errText += "количество получателей меньше, чем их. Распределить не получится"
-			// TODO: улучшить обработку и добавить в тесты
-			return errors.Join(ErrIncorrectRestrictions, errors.New(errText))
+			errText += "количество получателей меньше, чем их самих. Распределить не получится"
+			return errors.Wrap(ErrIncorrectRestrictions, errText)
 		}
 	}
 
