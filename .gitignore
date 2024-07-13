@@ -26,3 +26,6 @@ conf.toml
 
 # Built app
 secretSanta
+
+# ide
+.idea
