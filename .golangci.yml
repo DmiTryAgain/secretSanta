@@ -1,78 +1,76 @@
 run:
-  # default concurrency is a available CPU number
+  # Number of operating system threads (`GOMAXPROCS`) that can execute golangci-lint simultaneously.
+  # Default: the number of logical CPUs in the machine
   concurrency: 4
 
-  # timeout for analysis, e.g. 30s, 5m, default is 1m
-  deadline: 30m
+  # Timeout for analysis, e.g. 30s, 5m.
+  # Default: 1m
+  timeout: 30m
 
-  # exit code when at least one issue was found, default is 1
+  # Exit code when at least one issue was found.
+  # Default: 1
   issues-exit-code: 1
 
-  # include test files or not, default is true
+  # Include test files or not.
+  # Default: true
   tests: true
 
-  # skip files
-  skip-files:
+  # Allowed values: readonly|vendor|mod
+  # Default: ""
+  modules-download-mode: vendor
+  exclude-files:
     - ".*\\_gen\\.go$"
 
-  # use vendor dir
-  modules-download-mode: vendor
-
 output:
-  # colored-line-number|line-number|json|tab|checkstyle|code-climate, default is "colored-line-number"
-  format: colored-line-number
+  # The formats used to render issues.
+  # Formats:
+  # - `colored-line-number`
+  # - `line-number`
+  # - `json`
+  # - `colored-tab`
+  # - `tab`
+  # - `html`
+  # - `checkstyle`
+  # - `code-climate`
+  # - `junit-xml`
+  # - `github-actions`
+  # - `teamcity`
+  # - `sarif`
+  # Output path can be either `stdout`, `stderr` or path to the file to write to.
+  #
+  # Default:
+  #   formats:
+  #     - format: colored-line-number
+  #       path: stdout
+  formats:
+    - format: colored-line-number
 
-  # print lines of code with issue, default is true
+  # Print lines of code with issue.
+  # Default: true
   print-issued-lines: true
 
-  # print linter name in the end of issue text, default is true
+  # Print linter name in the end of issue text.
+  # Default: true
   print-linter-name: true
 
 linters-settings:
-  dupl:
-    # tokens count to trigger issue, 150 by default
-    threshold: 200
   goimports:
     # put imports beginning with prefix after 3rd-party packages;
     # it's a comma-separated list of prefixes
-    local-prefixes: vtsrv
-  govet:
-    # settings per analyzer
-    settings:
-      printf: # analyzer name, run `go tool vet help` to see all analyzers
-        funcs: # run `go tool vet help printf` to see available settings for `printf` analyzer
-          - (vtsrv/pkg/embedlog.Logger).Printf
-          - (vtsrv/pkg/embedlog.Logger).Errorf
+    local-prefixes: secretSanta
   gocritic:
     # Enable multiple checks by tags, run `GL_DEBUG=gocritic golangci-lint` run to see all tags and checks.
     # Empty list by default. See https://github.com/go-critic/go-critic#usage -> section "Tags".
-    enabled-checks:
-      - appendAssign
-      - appendCombine
-      - assignOp
-      - badCond
-      - boolExprSimplify
-      - captLocal
-      - caseOrder
-      - defaultCaseOrder
-      - dupArg
-      - dupBranchBody
-      - dupCase
-      - dupSubExpr
-      - elseif
-      - emptyFallthrough
-      - emptyStringTest
-      - equalFold
-      - exitAfterDefer
-      - flagName
-      - hexLiteral
-      - indexAlloc
-      - nilValReturn
-      - offBy1
-      - regexpMust
-      - sloppyLen
-      - switchTrue
-      - wrapperFunc
+    enabled-tags:
+      - performance
+      - opinionated
+      - diagnostic
+      - style
+      - experimental
+
+    disabled-checks:
+      - yodaStyleExpr
+      - whyNoLint
 
 linters:
   enable-all: false

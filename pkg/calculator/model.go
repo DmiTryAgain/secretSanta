@@ -17,14 +17,14 @@ var (
 
 type RestrictionsByParticipant map[ParticipantID]ParticipantIDs
 
-func NewRestrictionsByParticipant(in map[string][]string) (out RestrictionsByParticipant) {
-	if in == nil {
+func NewRestrictionsByParticipant(participants map[string]string, restrictions map[string][]string) (out RestrictionsByParticipant) {
+	if participants == nil {
 		return
 	}
 
-	out = make(RestrictionsByParticipant, len(in))
-	for k, v := range in {
-		out[ParticipantID(k)] = NewParticipantIDs(v)
+	out = make(RestrictionsByParticipant, len(restrictions))
+	for k := range participants {
+		out[ParticipantID(k)] = NewParticipantIDs(restrictions[k])
 	}
 
 	return

@@ -1,16 +1,12 @@
 MAIN := secretSanta
 PKG := `go list -mod=vendor -f {{.Dir}} ./...`
 
-ifeq ($(RACE),1)
-	RACEFLAG=-race
-endif
-
 build:
-	@CGO_ENABLED=0 go build -mod=vendor $(RACEFLAG) -o ${NAME} $(MAIN)
+	go build -o ${NAME} $(MAIN)
 
 run:
 	@echo "Compiling"
-	@go run -mod=vendor $(RACEFLAG) $(MAIN) -config=conf.toml -verbose -verbose_sql
+	@go run -mod=vendor $(MAIN) -config=conf.toml -verbose -verbose_sql
 
 mod:
 	@go mod tidy

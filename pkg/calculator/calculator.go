@@ -4,8 +4,8 @@ type Calculator struct {
 	restrictionByParticipant RestrictionsByParticipant
 }
 
-func NewCalculator(restrictions map[string][]string) (*Calculator, error) {
-	rs := NewRestrictionsByParticipant(restrictions)
+func NewCalculator(participants map[string]string, restrictions map[string][]string) (*Calculator, error) {
+	rs := NewRestrictionsByParticipant(participants, restrictions)
 	if err := rs.validate(); err != nil {
 		return nil, err
 	}
