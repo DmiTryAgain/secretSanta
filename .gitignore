@@ -29,3 +29,5 @@ secretSanta
 
 # ide
 .idea
+
+dist/
