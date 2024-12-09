@@ -217,7 +217,7 @@ func (a *App) sendMail(participantAddress mail.Address, body string) error {
 	auth := smtp.PlainAuth(
 		"",
 		senderAddress.Address,
-		a.cfg.EmailSender,
+		a.cfg.PasswordSender,
 		a.cfg.SmtpHost,
 	)
 	title := "Тайный Санта"
